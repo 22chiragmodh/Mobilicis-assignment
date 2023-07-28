@@ -5,7 +5,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:mobilicis/models/pushnotification.dart';
 import 'package:mobilicis/models/shopModel.dart';
 import 'package:mobilicis/screens/notification.dart';
-import 'package:mobilicis/utils/constants.dart';
+
 import 'package:mobilicis/widgets/carousalImage.dart';
 import 'package:mobilicis/widgets/filterButton.dart';
 import 'package:mobilicis/widgets/products.dart';
