@@ -34,6 +34,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
     super.initState();
     fetchData();
+    fetchFilters();
   }
 
   init() async {
@@ -49,6 +50,7 @@ class _MyHomePageState extends State<MyHomePage> {
     ShopBox(icon: Icons.phone_iphone, text: 'Shop By Price'),
   ];
   List<Map<String, dynamic>> listings = [];
+  Map<String, dynamic> filters = {};
 
   Future<void> fetchData() async {
     try {
@@ -62,7 +64,7 @@ class _MyHomePageState extends State<MyHomePage> {
           );
           _isLoading = false;
         });
-        print(listings);
+        // print(listings);
       }
     } catch (error) {
       // Handle error
@@ -70,6 +72,23 @@ class _MyHomePageState extends State<MyHomePage> {
         _isLoading = true;
       });
     }
+  }
+
+  Future<Map<String, dynamic>> fetchFilters() async {
+    try {
+      final response = await Dio().get(
+        'https://dev2be.oruphones.com/api/v1/global/assignment/getFilters?isLimited=true',
+      );
+      if (response.statusCode == 200) {
+        filters = response.data['filters'];
+        print(filters);
+        return filters;
+      }
+    } catch (error) {
+      // Handle error
+      print(error);
+    }
+    return {};
   }
 
   Future getdeviceToken() async {
@@ -257,7 +276,14 @@ class _MyHomePageState extends State<MyHomePage> {
                       IconButton(
                           icon: const Icon(Icons.filter_list),
                           onPressed: () {
-                            filterBottomMenu(context);
+                            List<dynamic> makeList = filters['make'] ?? [];
+                            List<dynamic> ramList = filters['ram'] ?? [];
+                            List<dynamic> storageList =
+                                filters['storage'] ?? [];
+                            List<dynamic> conditionList =
+                                filters['condition'] ?? [];
+                            filterBottomMenu(context, makeList, ramList,
+                                conditionList, storageList);
                           })
                     ],
                   ),
@@ -293,9 +319,15 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 
-  Future<void> filterBottomMenu(BuildContext context) {
+  Future<void> filterBottomMenu(
+      BuildContext context,
+      List<dynamic> makeList,
+      List<dynamic> ramList,
+      List<dynamic> storageList,
+      List<dynamic> conditionList) {
     int _lowerValue = 0;
     int _upperValue = 4000000;
+
     return showModalBottomSheet<void>(
       context: context,
       isScrollControlled: true,
@@ -307,7 +339,7 @@ class _MyHomePageState extends State<MyHomePage> {
       ),
       builder: (BuildContext context) {
         return Container(
-          height: MediaQuery.of(context).size.height * 0.8,
+          height: MediaQuery.of(context).size.height * 0.66,
           padding: const EdgeInsets.all(20.0),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.start,
@@ -335,7 +367,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 scrollDirection: Axis.horizontal,
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceAround,
-                  children: Constants.buttonTitleList
+                  children: makeList
                       .map(
                         (title) => Row(children: [
                           FilterButton(
@@ -360,7 +392,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 scrollDirection: Axis.horizontal,
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceAround,
-                  children: Constants.ramList
+                  children: ramList
                       .map(
                         (title) => Row(children: [
                           FilterButton(
@@ -385,7 +417,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 scrollDirection: Axis.horizontal,
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceAround,
-                  children: Constants.storageList
+                  children: storageList
                       .map(
                         (title) => Row(children: [
                           FilterButton(
@@ -410,7 +442,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 scrollDirection: Axis.horizontal,
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceAround,
-                  children: Constants.conditionList
+                  children: conditionList
                       .map(
                         (title) => Row(children: [
                           FilterButton(
@@ -423,52 +455,6 @@ class _MyHomePageState extends State<MyHomePage> {
                       )
                       .toList(),
                 ),
-              ),
-              const SizedBox(
-                height: 8,
-              ),
-              const Text("Warranty"),
-              const SizedBox(
-                height: 5,
-              ),
-              SingleChildScrollView(
-                scrollDirection: Axis.horizontal,
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceAround,
-                  children: Constants.warrentyList
-                      .map(
-                        (title) => Row(children: [
-                          FilterButton(
-                            onPress: () => updateSelectedBrand(title),
-                            titleBtn: title,
-                            isSelected: selectedBrand == title,
-                          ),
-                          SizedBox(width: 5),
-                        ]),
-                      )
-                      .toList(),
-                ),
-              ),
-              const SizedBox(
-                height: 8,
-              ),
-              const Text("Verification"),
-              const SizedBox(
-                height: 5,
-              ),
-              Row(
-                children: Constants.verificationList
-                    .map(
-                      (title) => Row(children: [
-                        FilterButton(
-                          onPress: () => updateSelectedBrand(title),
-                          titleBtn: title,
-                          isSelected: selectedBrand == title,
-                        ),
-                        SizedBox(width: 5),
-                      ]),
-                    )
-                    .toList(),
               ),
               const SizedBox(
                 height: 8,
